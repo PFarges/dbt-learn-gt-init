@@ -11,7 +11,7 @@ with
             status as payment_status,
 
             -- amount is stored in cents, convert it to dollars
-            round(amount / 100.0, 2) as payment_amount,
+            {{ cents_to_dollars("amount") }} as payment_amount,
             created as payment_created
         from source
     )
