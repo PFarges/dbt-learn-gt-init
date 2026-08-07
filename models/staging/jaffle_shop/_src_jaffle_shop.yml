@@ -15,6 +15,11 @@ sources:
               - not_null
               - unique
       - name: orders
+        columns:
+          - name: id
+            data_tests:
+              - not_null
+              - unique
         config:
           freshness:
             warn_after: 

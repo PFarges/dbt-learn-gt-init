@@ -1,0 +1,68 @@
+models:
+  - name: dim_customers
+    description: Customer data
+    columns:
+      - name: customer_id
+        description: the primary key for customers.
+        data_tests:
+          - unique
+          - not_null
+          - dbt_utils.cardinality_equality:
+              arguments:
+                field: customer_id
+                to: ref('stg_jaffle_shop__customers')
+
+  - name: fct_orders
+    columns:
+      - name: order_id
+        description: Primary key for orders.
+        data_tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: Foreign key to dim_customers.customer_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_customers')
+                field: customer_id
+      - name: amount
+        description: Order amount
+        data_tests:
+          - average_dollars_spent_greater_than_one:
+              arguments:
+                group_by_column: customer_id
+          - dbt_expectations.expect_column_values_to_be_between: 
+          # this will perform what the dbt_utils.expression-is-true test does!
+              arguments:
+                min_value: 0
+                row_condition: "order_id is not null" 
+                strictly: false
+          - dbt_expectations.expect_column_mean_to_be_between: 
+          # this will perform what our singular and generic tests do!
+              arguments:
+                min_value: 1
+                group_by: [customer_id] 
+                row_condition: "order_id is not null" # (Optional)
+                strictly: false
+
+  - name: fct_customer_orders
+    columns:
+      - name: order_id
+        description: Primary key for orders.
+        data_tests:
+          - unique
+          - not_null
+      - name: order_status
+        description: "{{ doc('order_status') }}"
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['shipped', 'completed', 'returned', 'return_pending']
+      - name: customer_id
+        description: Foreign key to dim_customers.customer_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_customers')
+                field: customer_id

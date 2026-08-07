@@ -1,3 +1,9 @@
+{{
+    config(
+        meta={'required_tests': None}
+    )
+}}
+
 with 
 
 orders as (
