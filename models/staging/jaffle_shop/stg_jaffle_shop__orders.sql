@@ -1,3 +1,5 @@
+{{ config(static_analysis="off") }}
+
 with
 
     source as (select * from {{ source("jaffle_shop", "orders") }}),
@@ -11,7 +13,8 @@ with
             status as order_status,
             case
                 when status not in ('returned', 'return_pending') then order_date
-            end as valid_order_date
+            end as valid_order_date,
+            datediff('day', order_date, current_timestamp()) as days_since_ordered
         from source
     )
 
