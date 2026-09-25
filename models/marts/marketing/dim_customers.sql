@@ -25,7 +25,11 @@ final as (
         customer_orders.first_order_date,
         customer_orders.most_recent_order_date,
         coalesce(customer_orders.number_of_orders, 0) as number_of_orders,
-        customer_orders.lifetime_value
+        customer_orders.lifetime_value,
+        case when 
+            coalesce(Customer_orders.number_of_orders, 0) < 3 then 'low' 
+            else 'high' 
+        end as customer_order_amount_category
     from customers
     left join customer_orders using (customer_id)
 )
